@@ -352,6 +352,19 @@ label.f{display:grid;gap:7px;font-weight:700;font-size:16px}
   .faq-grid{gap:16px}
   .faq-list{max-height:calc(100vh - 300px)}
 }
+@media (min-width:1700px){
+  html.deck .w{max-width:min(1680px,90vw)}
+  .hero h1{font-size:clamp(70px,min(8.4vw,15vh),230px)}
+  .big-h{font-size:clamp(60px,min(6.2vw,12vh),150px)}
+  .beat h3{font-size:clamp(50px,min(4.2vw,7.4vh),96px)}
+  .clock{font-size:clamp(120px,min(12.5vw,24vh),270px)}
+  .copy,.beat p,.lede{font-size:clamp(20px,1.15vw,27px)}
+  .price{font-size:clamp(120px,min(15vw,30vh),300px)}
+  .kicker{font-size:14px}
+  html.deck .hero-phone{zoom:1.3}
+  .mstage{height:min(62vh,820px)}
+}
+@media (min-width:2200px){html.deck .w{max-width:min(2060px,88vw)}}
 @media (max-height:700px) and (min-width:901px){
   .lede{font-size:17px}
   .hero h1{font-size:clamp(48px,min(8vw,14vh),130px)}
@@ -891,7 +904,10 @@ label.f{display:grid;gap:7px;font-weight:700;font-size:16px}
   });
 
   /* ================= the deck: one step per gesture ================= */
-  if (!window.gsap || reduce) return; /* plain scrolling page */
+  /* Full-screen scenes need some height. A phone held sideways or a very short window gets the plain scrolling page instead. */
+  var roomy = innerHeight >= 560 && innerWidth >= 320;
+  if (matchMedia('(pointer: coarse)').matches) matchMedia('(orientation: portrait)').addEventListener('change', function () { location.reload(); });
+  if (!window.gsap || reduce || !roomy) return; /* plain scrolling page */
   var html = document.documentElement;
   html.classList.add('deck');
   var sw = $('sweep'); for (var n = 1; n <= 30; n++) { var sp = document.createElement('span'); sp.style.left = ((n - 1) * 100) + 'px'; sp.textContent = n * 10; sw.appendChild(sp); }
@@ -909,7 +925,7 @@ label.f{display:grid;gap:7px;font-weight:700;font-size:16px}
   /* scale the 3D stages to fit the screen */
   function fitStage(stage, scaleEl, natW, natH, reserve) {
     var availH = innerHeight - 96 - reserve, availW = stage.clientWidth;
-    var s = Math.max(0.36, Math.min(mobile ? 1 : 1.3, availH / natH, availW / natW));
+    var s = Math.max(0.36, Math.min(mobile ? 1 : Math.min(2, Math.max(1.3, innerWidth / 1100)), availH / natH, availW / natW));
     scaleEl.style.transform = 'scale(' + s + ')';
     stage.style.height = Math.round(natH * s) + 'px';
   }
@@ -918,7 +934,28 @@ label.f{display:grid;gap:7px;font-weight:700;font-size:16px}
     fitStage(document.querySelector('.try-stage'), $('try-scale'), mobile ? 332 : 602, mobile ? 640 : 660, mobile ? 250 : 0);
   }
   fit();
-  addEventListener('resize', function () { if (matchMedia('(max-width: 900px)').matches !== mobile) { location.reload(); return; } fit(); });
+  var lastW = innerWidth;
+  addEventListener('resize', function () {
+    if (matchMedia('(max-width: 900px)').matches !== mobile) { location.reload(); return; }
+    fit();
+    if (Math.abs(innerWidth - lastW) > 20) { lastW = innerWidth; fitScenes(); } /* ignore height-only changes, like a keyboard opening */
+  });
+
+  /* Safety net for every screen: if a scene's tallest step is taller than the screen, shrink that whole scene to fit. */
+  function fitScenes() {
+    SC.forEach(function (sc) {
+      var w = sc.inner.querySelector('.w'); if (!w) return;
+      w.style.zoom = 1;
+      var avail = innerHeight - 64 - 60, tall = w.getBoundingClientRect().height;
+      if (sc.tl) {
+        var t0 = sc.tl.time();
+        sc.labels.forEach(function (L) { sc.tl.time(L, true); tall = Math.max(tall, w.getBoundingClientRect().height); });
+        sc.tl.time(t0, true);
+      }
+      var s = Math.min(1, avail / tall);
+      w.style.zoom = s < 0.995 ? s.toFixed(3) : 1;
+    });
+  }
 
   /* timelines: each scene has one paused master timeline with a label per step, and a step is a tween to its label */
   var $q = function (root, q) { return root.querySelector(q); }, $$q = function (root, q) { return Array.prototype.slice.call(root.querySelectorAll(q)); };
@@ -963,8 +1000,8 @@ label.f{display:grid;gap:7px;font-weight:700;font-size:16px}
         .to(fly, { x: -55, y: -150, z: 190, scale: 1, rotationY: 6, rotationX: -6, duration: 1.3 }, 9.9)
         .to(fly, { opacity: 0, scale: 0.9, duration: 0.35 }, 11.1)
         .to(job, { maxHeight: 170, opacity: 1, paddingTop: 11, paddingBottom: 12, duration: 0.5 }, 11.0)
-        .to(dv, { x: -40, z: 120, scale: 1.06, rotationY: 4, duration: 1.3 }, 9.9)
-        .to(cu, { x: 250, z: -160, rotationY: -34, opacity: 0.3, duration: 1.3 }, 9.9);
+        .to(dv, { x: -40, z: 60, scale: 1.02, rotationY: 4, duration: 1.3 }, 9.9)
+        .to(cu, { x: 195, z: -160, rotationY: -34, opacity: 0.3, duration: 1.3 }, 9.9);
     } else {
       tl.to(cu, { x: 360, rotationY: -60, opacity: 0, duration: 1.2 }, 9.7)
         .to(dv, { x: 0, rotationY: -6, opacity: 1, duration: 1.4 }, 9.9)
@@ -1056,7 +1093,14 @@ label.f{display:grid;gap:7px;font-weight:700;font-size:16px}
     tl.to(price, { scale: 1, opacity: 1, duration: 0.9, ease: 'expo.out' }, 0.1).to(perks, { opacity: 1, x: 0, duration: 0.6, stagger: 0.18 }, 0.7)
       .to(coin, { rotationY: 0, opacity: 1, duration: 1.2, ease: 'back.out(1.4)' }, 0.6);
     tl.to(flipper, { rotationY: 180, duration: 1.4, ease: 'power3.inOut' }, 2.5);
-    if (mobile) { gsap.set(copy, { maxHeight: copy.scrollHeight, overflow: 'hidden' }); tl.to(copy, { maxHeight: 0, opacity: 0, duration: 0.9, ease: 'power2.inOut' }, 2.5); }
+    if (mobile) {
+      /* on a phone the price step only needs the coin's height, so the hidden form doesn't take up room until it flips in */
+      var backEl = $q(el, '.back');
+      gsap.set(flipper, { height: (coin.offsetHeight || 210) });
+      tl.to(flipper, { height: backEl.scrollHeight, duration: 1.4, ease: 'power3.inOut' }, 2.5);
+      gsap.set(copy, { maxHeight: copy.scrollHeight, overflow: 'hidden' });
+      tl.to(copy, { maxHeight: 0, opacity: 0, duration: 0.9, ease: 'power2.inOut' }, 2.5);
+    }
     tl.to({}, { duration: 0.01 }, 4.1);
     sc.tl = tl; sc.labels = [2.3, 4.1];
   }
@@ -1064,6 +1108,8 @@ label.f{display:grid;gap:7px;font-weight:700;font-size:16px}
   buildStory(SC[byId['sc-story']]); buildMoney(SC[byId['sc-money']]); buildCard(SC[byId['sc-card']]);
   buildSetup(SC[byId['sc-setup']]); buildStart(SC[byId['sc-start']]);
   SC[byId['sc-try']].onEnter = function () { setTimeout(autoplay, 700); };
+  fitScenes();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fit(); fitScenes(); });
 
   /* the rail, header and progress tape */
   var rail = $('rail'), ticks = [];
