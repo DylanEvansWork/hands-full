@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex">
+<title>Hands Full</title>
+<meta name="description" content="Missed a call because you were on a job? Your customer gets a text straight back, and you get the details on a job card. £15 a month, nothing to install.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FFD60A'/%3E%3Cpath d='M4 22h24M4 22v-4M10 22v-2M16 22v-4M22 22v-2M28 22v-4' stroke='%2314130F' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one full-screen scene at a time, one step per scroll gesture. Black scenes with big yellow numbers and 3D phones, bookended by two yellow ones. Without scripts or with reduced motion it is an ordinary scrolling page. */
+:root{
+  --y:#FFD60A; --k:#111110; --w:#FFFFFF; --p:#EDECE6; --line:#D6D5CC; --mut:#5C5B53; --red:#D92B26;
+  --display:'Archivo','Arial Narrow',Arial,sans-serif;
+  --body:'Archivo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html:not(.deck){scroll-behavior:smooth}
+body{margin:0;background:var(--k);color:var(--w);font:400 18px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--y);outline-offset:3px}
+.theme-y :focus-visible{outline-color:var(--k)}
+.w{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 28px;border:2px solid var(--k);border-radius:3px;font:800 17px/1 var(--body);text-decoration:none;cursor:pointer;background:var(--k);color:var(--y);transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--k)}
+.btn:active{transform:none;box-shadow:none}
+h1,h2,h3{font-family:var(--display);font-stretch:62%;font-weight:900;text-transform:uppercase;letter-spacing:0;text-wrap:balance;margin:0}
+.kicker{font:500 12px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--y);margin:0 0 18px}
+.theme-y .kicker{color:var(--k)}
+.big-h{font-size:clamp(46px,min(7vw,12vh),104px);line-height:.88;color:var(--w)}
+.big-h em{font-style:normal;color:var(--y)}
+.copy{color:#cfcec4;font-size:clamp(17px,1.5vw,20px);line-height:1.5;max-width:26em;margin:20px 0 0}
+
+/* scenes */
+.theme-y{background-color:var(--y);color:var(--k);background-image:linear-gradient(rgba(17,17,16,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(17,17,16,.05) 1px,transparent 1px),linear-gradient(rgba(17,17,16,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(17,17,16,.09) 1px,transparent 1px);background-size:40px 40px,40px 40px,200px 200px,200px 200px}
+.theme-k{background-color:var(--k);color:var(--w);background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.075) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.075) 1px,transparent 1px);background-size:40px 40px,40px 40px,200px 200px,200px 200px}
+html.deck .w{max-width:1320px}
+.scene{position:relative;padding-block:clamp(72px,10vw,128px)}
+.scene-in{width:100%}
+#bar{position:absolute;top:0;left:0;right:0;z-index:80;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));color:var(--w)}
+.mark{font:900 28px/1 var(--display);font-stretch:62%;text-transform:uppercase;text-decoration:none;letter-spacing:.01em}
+#bar .btn{min-height:42px;padding:0 18px;font-size:15px;background:var(--y);color:var(--k);border-color:var(--y)}
+#rail,#pager,#prog,#sweep{display:none}
+html.deck #sweep{display:block;position:fixed;left:0;right:0;top:0;height:132px;z-index:70;pointer-events:none;opacity:0;overflow:hidden;background:var(--y);border-block:3px solid var(--k);will-change:transform}
+#sweep::before{content:"";position:absolute;left:0;right:0;top:0;height:16px;background:repeating-linear-gradient(90deg,var(--k) 0 2px,transparent 2px 10px)}
+#sweep::after{content:"";position:absolute;left:0;right:0;bottom:0;height:38px;background:repeating-linear-gradient(90deg,var(--k) 0 3px,transparent 3px 100px)}
+#sweep span{position:absolute;top:30px;font:900 52px/1 var(--display);font-stretch:62%;color:var(--k);margin-left:8px}
+
+/* deck mode: full-screen scenes, driven by the script */
+html.deck,html.deck body{height:100%;overflow:hidden;overscroll-behavior:none}
+html.deck #deck{position:fixed;inset:0;perspective:1800px;touch-action:none}
+html.deck .scene{position:absolute;inset:0;padding:0;visibility:hidden;overflow:hidden;display:flex;align-items:center}
+html.deck .scene.on{visibility:visible}
+html.deck .scene-in{padding:64px 0 60px;perspective:1600px}
+html.deck #bar{position:fixed}
+html.deck[data-theme="y"] #bar{color:var(--k)}
+html.deck[data-theme="y"] #bar .btn{background:var(--k);color:var(--y);border-color:var(--k)}
+html.deck #prog{display:block;position:fixed;top:0;left:0;right:0;height:8px;z-index:90;pointer-events:none}
+#prog i{display:block;height:100%;width:100%;transform:scaleX(0);transform-origin:0 50%;background:repeating-linear-gradient(90deg,var(--k) 0 2px,var(--y) 2px 8px);border-bottom:2px solid var(--k)}
+html.deck #rail{display:flex;position:fixed;right:max(12px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:80;flex-direction:column;align-items:flex-end;gap:3px;color:var(--w)}
+html.deck[data-theme="y"] #rail{color:var(--k)}
+.tick{border:0;background:none;padding:6px 0 6px 12px;cursor:pointer;display:block}
+.tick i{display:block;height:2px;width:12px;background:currentColor;opacity:.4;transition:width .3s,opacity .3s}
+.tick.first i{width:20px;opacity:.6}
+.tick.now i{width:34px;opacity:1}
+html.deck #pager{display:flex;position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;gap:4px;align-items:center}
+html.deck #pager button{display:flex;align-items:center;gap:10px;background:none;border:0;cursor:pointer;font:500 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--w);padding:12px 16px}
+html.deck[data-theme="y"] #pager button{color:var(--k)}
+#pager svg{display:block}
+#prev.off{visibility:hidden}
+@media (prefers-reduced-motion:no-preference){#next svg{animation:nudge 1.6s ease-in-out infinite}@keyframes nudge{50%{transform:translateY(5px)}}}
+html.deck[data-scene="sc-hero"] #pager{bottom:calc(50px + env(safe-area-inset-bottom,0px))}
+@media (max-width:900px){html.deck #rail{display:none}}
+
+/* hero */
+.hero-w{position:relative;z-index:2}
+.eyebrow{font:500 13px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;margin:0 0 22px}
+.hero h1{font-size:clamp(52px,min(9.2vw,15vh),168px);line-height:.88}
+.hl{background:linear-gradient(var(--k),var(--k)) 0 58%/100% .76em no-repeat;color:var(--y);padding:0 .1em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.lede{font-size:clamp(18px,min(1.8vw,2.6vh),22px);line-height:1.45;max-width:27em;margin:clamp(18px,3.4vh,34px) 0;font-weight:500}
+.cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px}
+.fine{font:500 13px/1.4 var(--mono)}
+.tape{height:36px;background:var(--y);position:relative;border-top:3px solid var(--k)}
+.tape::before,.tape::after{content:"";position:absolute;left:0;right:0;top:0}
+.tape::before{height:22px;background:repeating-linear-gradient(90deg,var(--k) 0 2px,transparent 2px 50px)}
+.tape::after{height:12px;background:repeating-linear-gradient(90deg,var(--k) 0 1px,transparent 1px 10px)}
+.hero .tape{position:absolute;left:0;right:0;bottom:0}
+.hero-phone{display:none}
+html.deck .hero-phone{display:block;position:absolute;right:max(20px,3vw);bottom:-250px;z-index:1;pointer-events:none;perspective:1400px;transform-style:preserve-3d}
+html.deck .hero-phone .ph3{width:340px}
+html.deck .hero-phone .screen{height:660px}
+html.deck .hero-note{position:absolute;left:-190px;top:90px;width:270px;z-index:9;box-shadow:0 26px 44px -14px rgba(0,0,0,.5);opacity:0}
+@media (max-width:1150px){html.deck .hero-note{display:none}}
+html.deck .hero-phone .ph3{transform:rotateX(16deg) rotateY(-24deg) rotateZ(6deg);box-shadow:0 0 0 2px #34332e,0 40px 70px -20px rgba(0,0,0,.6)}
+@media (max-width:900px){html.deck .hero-phone{display:none}}
+
+/* phones */
+.phone{background:var(--k);border-radius:40px;padding:11px;position:relative;transform-style:preserve-3d;box-shadow:0 0 0 2px #34332e,0 40px 70px -20px rgba(0,0,0,.7),0 0 110px rgba(255,214,10,.09)}
+.phone::before,.ph3::before{content:"";position:absolute;left:-4px;top:112px;width:4px;height:46px;border-radius:2px 0 0 2px;background:#2a2925;box-shadow:0 66px 0 #2a2925}
+.phone::after,.ph3::after{content:"";position:absolute;inset:11px;border-radius:30px;background:linear-gradient(115deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,0) 34%);pointer-events:none;z-index:8}
+.screen::before,.lock::before,.lockscr::before,.setup-screen::before{content:"";position:absolute;top:9px;left:50%;width:84px;height:23px;margin-left:-42px;background:#000;border-radius:12px;z-index:6}
+.screen{position:relative;background:var(--w);color:var(--k);border-radius:30px;height:604px;display:flex;flex-direction:column;overflow:hidden}
+.screen-head{display:flex;justify-content:space-between;gap:12px;font:500 11px/1 var(--mono);color:var(--mut);padding:38px 18px 12px;border-bottom:1px solid var(--line)}
+.screen-head b{color:var(--k);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msgs{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:14px 12px;touch-action:pan-y}
+.m{max-width:86%;padding:9px 12px;border-radius:16px;font-size:14.5px;line-height:1.35;overflow-wrap:anywhere}
+.m.a{background:var(--p);border-bottom-left-radius:4px;align-self:flex-start}
+.m.c{background:var(--k);color:var(--w);border-bottom-right-radius:4px;align-self:flex-end}
+.m.t{color:var(--mut);letter-spacing:.2em}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
+.chip{font:600 12.5px/1.2 var(--body);padding:7px 11px;border-radius:14px;border:1.5px solid var(--k);background:var(--w);color:var(--k);cursor:pointer;text-align:left}
+.chip:hover{background:var(--y)}
+.inrow{display:flex;gap:6px;padding:8px 10px 14px;border-top:1px solid var(--line)}
+.inrow input{flex:1;min-width:0;font:400 15px/1 var(--body);min-height:42px;padding:0 14px;border-radius:21px;border:1.5px solid var(--line);background:var(--w);color:var(--k)}
+.inrow button{flex:none;min-height:42px;padding:0 16px;border-radius:21px;border:0;background:var(--k);color:var(--y);font:800 14px/1 var(--body);cursor:pointer}
+.fakein{flex:1;min-height:40px;border-radius:20px;border:1.5px solid var(--line);color:#8a897f;font-size:14px;display:flex;align-items:center;padding:0 14px}
+.derr{font:500 12px/1 var(--mono);color:var(--red);padding:0 14px 6px;min-height:0}
+.again{border:0;background:none;font:700 14px/1 var(--body);text-decoration:underline;cursor:pointer;color:var(--k);padding:10px 14px 14px}
+.lockscr,.lock{position:relative;background:#1d1c18;border-radius:30px;color:var(--w);display:flex;flex-direction:column;overflow:hidden}
+.lock{height:470px;padding:44px 12px 14px}
+.lock::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46px;background:repeating-linear-gradient(90deg,var(--y) 0 2px,transparent 2px 22px);opacity:.35;-webkit-mask:linear-gradient(transparent,#000);mask:linear-gradient(transparent,#000)}
+.lock-time{font:900 72px/.9 var(--display);font-stretch:62%;text-align:center}
+.lock-sub{font:500 11px/1.3 var(--mono);text-align:center;color:#b5b4aa;margin:8px 0 20px;text-transform:uppercase;letter-spacing:.05em}
+.notes{display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.note{background:rgba(255,255,255,.94);color:var(--k);border-radius:14px;padding:11px 12px}
+.n-top{display:flex;align-items:center;gap:7px;font:500 10.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+.n-ico{width:18px;height:18px;border-radius:5px;background:var(--y);border:1.5px solid var(--k);position:relative;flex:none}
+.n-ico::after{content:"";position:absolute;left:2.5px;right:2.5px;bottom:3.5px;height:5px;background:repeating-linear-gradient(90deg,var(--k) 0 1.5px,transparent 1.5px 4px)}
+.n-ico.red{background:var(--red);border-color:var(--red)}.n-ico.red::after{display:none}
+.n-top span:last-child{margin-left:auto;color:var(--mut)}
+.n-body{font:600 14px/1.3 var(--body)}
+.n-body small{display:block;font:400 12px/1.4 var(--mono);color:var(--mut);margin-top:2px}
+.n-row{display:grid;grid-template-columns:44px minmax(0,1fr);gap:6px;font:400 12.5px/1.4 var(--mono)}
+.n-row dt{color:var(--mut)}.n-row dd{margin:0}
+.note dl{margin:0;display:grid;gap:2px}
+.urgent-tag{background:var(--red);color:var(--w);padding:3px 5px;border-radius:3px;margin-left:6px}
+@media (prefers-reduced-motion:no-preference){
+  .note.pop{animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+  @keyframes pop{from{transform:translateY(-14px) scale(.96);opacity:0}}
+  .phone.d.buzz{animation:buzz .55s linear}
+  @keyframes buzz{10%,50%,90%{transform:translateX(-4px) rotate(-1deg)}30%,70%{transform:translateX(4px) rotate(1deg)}100%{transform:none}}
+}
+
+/* try it */
+.try-grid{display:grid;grid-template-columns:minmax(0,4.5fr) minmax(0,7.5fr);gap:clamp(24px,4vw,56px);align-items:center}
+.who{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:26px;max-width:380px}
+.who input{font:600 15px/1 var(--body);min-height:46px;padding:0 12px;border:2px solid #4a4943;border-radius:3px;background:transparent;color:var(--w);width:100%}
+.who input::placeholder{color:#8a897f;font-weight:500}
+.hint{font:400 13px/1.4 var(--mono);color:#a5a499;margin:14px 0 0}
+.stage3d .scale{display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-start}
+.try-stage .scale{gap:20px;flex-wrap:nowrap}
+.try-stage .phone{width:332px;flex:none}
+.try-stage .phone.d{width:250px;margin-top:84px}
+.mobnote{display:none}
+html.deck .stage3d{position:relative;perspective:1700px;perspective-origin:50% 35%}
+html.deck .stage3d .scale{display:block;position:relative;left:50%;transform-origin:50% 0}
+html.deck .try-stage .scale{display:flex;width:602px;margin-left:-301px;height:700px}
+@media (max-width:900px){
+  .try-grid{grid-template-columns:minmax(0,1fr);gap:14px}
+  .try-copy .copy,.try-copy .hint{display:none}
+  .who{margin-top:14px;max-width:none}
+  .try-stage .phone.d{display:none}
+  html.deck .try-stage .scale{width:332px;margin-left:-166px;height:640px}
+  .mobnote{display:block;position:absolute;left:14px;right:14px;bottom:70px;z-index:5;opacity:0;pointer-events:none}
+  .mobnote.show{opacity:1}
+}
+
+/* the missed call story */
+.story-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,5vw,64px);align-items:center}
+.clock{font:900 clamp(96px,min(14vw,24vh),200px)/.8 var(--display);font-stretch:62%;color:var(--y);font-variant-numeric:tabular-nums;margin:0 0 22px}
+.beat{margin:0 0 30px}
+.beat .t{display:block;font:500 13px/1 var(--mono);color:var(--y);margin-bottom:8px}
+.beat h3{font-size:clamp(38px,min(4.6vw,7.4vh),66px);line-height:.92;color:var(--w)}
+.beat p{margin:12px 0 0;font-size:clamp(17px,1.6vw,20px);color:#cfcec4;max-width:26em;line-height:1.45}
+html.deck .beats{position:relative;height:250px}
+html.deck .beat{position:absolute;left:0;right:0;top:0;margin:0}
+html.deck .beat .t{display:none}
+.ph3{position:relative;width:292px;background:var(--k);border-radius:40px;padding:11px;box-shadow:0 0 0 2px #34332e}
+.ph3 .screen{height:594px}
+.ph3 .m{font-size:14px;padding:8px 11px}
+.ph3 .msgs{gap:6px;padding:8px 10px 6px}
+.lockscr{height:594px;padding:52px 12px 14px}
+.lockscr .notes{overflow:visible}
+.callscr{display:none;position:absolute;inset:0;background:#0d0d0b;flex-direction:column;align-items:center;padding:64px 20px 36px;text-align:center;z-index:2}
+.callscr small{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#b5b4aa}
+.callscr .num{font:900 46px/1 var(--display);font-stretch:62%;margin:14px 0 4px}
+.callscr .nm{color:#b5b4aa;font-size:14px}
+.avatar{width:92px;height:92px;border-radius:50%;background:#2a2924;margin:auto 0 0;position:relative;display:grid;place-items:center}
+.avatar::before,.avatar::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--y);opacity:0}
+.avatar b{font:900 40px/1 var(--display);font-stretch:62%;color:var(--y)}
+.callbtns{display:flex;gap:64px;margin-top:44px}
+.cb{display:grid;gap:8px;justify-items:center;font:500 11px/1 var(--mono);color:#b5b4aa;text-transform:uppercase}
+.cb i{width:58px;height:58px;border-radius:50%;display:block}
+.cb.no i{background:var(--red)}.cb.yes i{background:#2E9E4F}
+.flycard{display:none;background:#FBFAF5;color:var(--k);border:2px solid var(--k);border-radius:6px;padding:14px 16px;font:400 12.5px/1.45 var(--mono);box-shadow:0 30px 50px -18px #000}
+.flycard header{font-weight:500;letter-spacing:.06em;text-transform:uppercase;font-size:11px;border-bottom:2px solid var(--k);padding-bottom:7px;margin-bottom:8px}
+.flycard dl{margin:0;display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 8px}
+.flycard dt{color:var(--mut)}.flycard dd{margin:0}
+@media (prefers-reduced-motion:no-preference){
+  html.deck .avatar::before{animation:pulse 1.5s ease-out infinite}
+  html.deck .avatar::after{animation:pulse 1.5s ease-out .75s infinite}
+  @keyframes pulse{from{transform:scale(1);opacity:.7}to{transform:scale(2.1);opacity:0}}
+  html.deck .ph3.ringing .lockscr{animation:rattle .42s linear infinite}
+  @keyframes rattle{25%{transform:translateX(-3px) rotate(-.5deg)}75%{transform:translateX(3px) rotate(.5deg)}}
+}
+html.deck .story-stage .scale{height:650px;width:610px;margin-left:-305px}
+html.deck .story-stage .ph3{position:absolute;left:50%;top:0;margin-left:-146px;transform-style:preserve-3d;box-shadow:0 0 0 2px #34332e,0 40px 70px -20px #000,0 0 110px rgba(255,214,10,.09)}
+html.deck .flycard{display:block;position:absolute;left:50%;top:230px;width:250px;margin-left:-125px;transform-style:preserve-3d}
+html.deck .callscr{display:flex}
+
+/* money */
+.figlabel{font:500 13px/1.3 var(--mono);color:#cfcec4;text-transform:uppercase;letter-spacing:.08em;margin:10px 0 24px}
+.mstage{position:relative;height:min(60vh,520px);perspective:1400px}
+.tiles{display:grid;grid-template-columns:repeat(13,1fr);gap:clamp(4px,.7vw,9px);align-content:center;transform-style:preserve-3d}
+.tile{aspect-ratio:1;border:2px solid #4a4943;border-radius:3px;position:relative;display:grid;place-items:center;font:700 clamp(8px,1.1vw,14px)/1 var(--mono);color:var(--k)}
+.tile.job{border-color:var(--y);background:var(--y)}
+.tile b{font-weight:700}
+.bars{display:flex;gap:clamp(20px,4vw,48px);align-items:flex-end;justify-content:center;margin-top:24px;--pct:.12}
+.bar{width:min(34%,170px);height:300px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px}
+.bar .col{width:100%;border-radius:3px 3px 0 0;background:var(--y);transform-origin:50% 100%;height:calc(100% - 96px)}
+.bar.cost .col{background:#74736a;height:calc((100% - 96px) * var(--pct))}
+.amt{font:900 clamp(30px,4vw,54px)/.9 var(--display);font-stretch:62%;color:var(--y)}
+.bar.cost .amt{color:var(--w)}
+.cap{font:500 12px/1.3 var(--mono);color:#cfcec4;text-align:center;text-transform:uppercase;letter-spacing:.05em}
+.jv{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px;align-items:center}
+.jv span{font:500 12px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:#cfcec4;width:100%}
+.jv button{min-height:42px;padding:0 16px;border-radius:3px;border:2px solid #4a4943;background:transparent;color:var(--w);font:800 16px/1 var(--body);cursor:pointer}
+.jv button[aria-pressed="true"]{background:var(--y);border-color:var(--y);color:var(--k)}
+html.deck .mstage .tiles{position:absolute;left:0;right:0;top:0;bottom:0}
+html.deck .mstage .bars{position:absolute;left:0;right:0;top:0;bottom:0;margin:0;padding-bottom:6px}
+html.deck .mstage .bar{height:100%}
+
+#sc-money .clock,#sc-money .beat h3,#sc-money .amt,#sc-money .bar.cost .amt{color:var(--k)}
+#sc-money .beat p,#sc-money .figlabel,#sc-money .jv span,#sc-money .cap{color:#3a3610}
+#sc-money .tile{border-color:rgba(17,17,16,.32)}
+#sc-money .tile.job{background:var(--k);border-color:var(--k)}
+#sc-money .tile b{color:var(--y)}
+#sc-money .bar .col{background:var(--k)}
+#sc-money .bar.cost .col{background:rgba(17,17,16,.38)}
+#sc-money .jv button{border-color:var(--k);color:var(--k)}
+#sc-money .jv button[aria-pressed="true"]{background:var(--k);color:var(--y)}
+
+/* job card */
+.list{list-style:none;margin:28px 0 0;padding:0;border-top:2px solid var(--y)}
+.list li{padding:14px 0;border-bottom:1px solid #3a3934;font-weight:600;font-size:clamp(16px,1.6vw,19px)}
+.card-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(36px,6vw,96px);align-items:center}
+.ticketwrap{position:relative;justify-self:center;width:100%;max-width:460px;perspective:1200px}
+.ticket{background:#FBFAF5;color:var(--k);border:2px solid var(--k);border-bottom:0;padding:24px 26px 40px;font:400 15.5px/1.5 var(--mono);width:100%;
+  -webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/22px 100%;mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/22px 100%}
+.ticket header{display:flex;justify-content:space-between;border-bottom:3px solid var(--k);padding-bottom:10px;margin-bottom:14px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.ticket dl{margin:0;display:grid;grid-template-columns:70px minmax(0,1fr);gap:9px 12px}
+.ticket dt{color:var(--mut);padding:0 4px;margin:0 -4px}.ticket dd{margin:0;padding:0 4px}
+.ticket .foot{margin-top:18px;padding-top:12px;border-top:1px dashed #b9b8ad;color:var(--mut);font-size:13px}
+.stamp{position:absolute;right:-14px;top:42%;border:4px solid var(--red);color:var(--red);padding:6px 14px;font:900 34px/1 var(--display);font-stretch:62%;text-transform:uppercase;letter-spacing:.04em;transform:rotate(-12deg);background:rgba(251,250,245,.55)}
+
+/* setup */
+.setup-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(36px,6vw,96px);align-items:center;perspective:1500px}
+.setup-phone{max-width:340px;justify-self:center;width:100%}
+.setup-screen{position:relative;background:var(--w);color:var(--k);border-radius:30px;padding:36px 18px 20px;display:grid;gap:10px}
+.setup-screen h3{font-size:30px;line-height:.9;margin-bottom:6px}
+.sbtn{display:block;background:var(--k);color:var(--w);text-align:center;font-weight:800;font-size:16px;padding:15px 10px;border-radius:10px}
+.sbtn small{display:block;font:400 12px/1.2 var(--mono);color:#bdbcb2;margin-top:4px}
+.islive{margin-top:6px;border:2px solid var(--k);border-radius:10px;padding:12px;font:500 13px/1.4 var(--mono);display:flex;gap:10px;align-items:center}
+.islive i{width:12px;height:12px;border-radius:50%;background:#2E9E4F;flex:none}
+
+/* start */
+.start-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:center}
+.price{font:900 clamp(100px,min(17vw,30vh),230px)/.8 var(--display);font-stretch:62%;margin:0;display:flex;align-items:baseline;gap:14px;transform-origin:0 100%}
+.price small{font:500 20px/1.2 var(--mono)}
+.perks{list-style:none;margin:clamp(18px,4vh,32px) 0 0;padding:0;border-top:2px solid var(--k)}
+.perks li{padding:13px 0;border-bottom:1.5px solid var(--k);font-weight:500}
+.perks b{font-weight:800}
+.flip{position:relative;perspective:1400px}
+.flipper{position:relative;transform-style:preserve-3d}
+.front{display:none}
+html.deck .front{display:grid;position:absolute;inset:0;place-items:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+html.deck .back{transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.coin{width:min(300px,100%);aspect-ratio:1;border-radius:50%;background:var(--k);color:var(--y);display:grid;place-items:center;text-align:center;font:900 clamp(60px,9vw,110px)/.82 var(--display);font-stretch:62%;text-transform:uppercase;box-shadow:inset 0 0 0 8px var(--k),inset 0 0 0 12px var(--y)}
+.coin small{display:block;font:500 14px/1.2 var(--mono);letter-spacing:.1em;margin-top:10px}
+#f{display:grid;gap:16px;background:var(--w);color:var(--k);border:2px solid var(--k);padding:clamp(20px,3.4vw,34px);border-radius:3px;box-shadow:8px 8px 0 var(--k)}
+#f h3{font-size:clamp(32px,3.6vw,46px);line-height:.9}
+label.f{display:grid;gap:7px;font-weight:700;font-size:16px}
+.f input,.f select{font:400 18px/1 var(--body);min-height:52px;padding:0 14px;border-radius:3px;border:2px solid var(--k);background:var(--w);color:var(--k);width:100%}
+.f input:focus-visible,.f select:focus-visible{outline:3px solid var(--y);outline-offset:0;box-shadow:0 0 0 5px var(--k)}
+.err{color:var(--red);font:500 13px/1.3 var(--mono)}
+#f .btn{width:100%;min-height:58px;font-size:19px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.ok{background:var(--w);color:var(--k);border:2px solid var(--k);padding:clamp(24px,4vw,40px);border-radius:3px;box-shadow:8px 8px 0 var(--k)}
+.ok h3{font-size:clamp(40px,5vw,64px);line-height:.9;margin-bottom:12px}
+.ok p{margin:0}
+.privacy{font:400 12.5px/1.45 var(--mono);color:var(--mut);margin:0}
+
+/* faq */
+.faq-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(28px,5vw,80px);align-items:start}
+.faq-list{max-height:calc(100vh - 190px);overflow-y:auto;touch-action:pan-y;padding-right:6px}
+.faq-list details{border-bottom:1px solid #3a3934}
+.faq-list details:first-child{border-top:2px solid var(--y)}
+.faq-list summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:24px;padding:20px 0;font-weight:800;font-size:clamp(18px,2vw,22px);line-height:1.2}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary::after{content:"+";font:400 30px/1 var(--mono);flex:none;color:var(--y)}
+.faq-list details[open] summary::after{content:"\2212"}
+.faq-list p{margin:0 0 22px;color:#cfcec4;max-width:36em;font-size:18px}
+
+/* end */
+.giant{font:900 clamp(70px,19vw,290px)/.8 var(--display);font-stretch:62%;text-transform:uppercase;white-space:nowrap;color:var(--y);letter-spacing:-.005em;user-select:none;margin:0}
+.end-foot{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;align-items:center;margin-top:clamp(20px,4vh,40px);font:400 13px/1.5 var(--mono);color:#bdbcb2}
+.end-foot .btn{background:var(--y);color:var(--k);border-color:var(--y)}
+
+/* narrow screens */
+@media (min-width:901px){#sc-story .story-grid{grid-template-columns:minmax(0,4.4fr) minmax(0,7.6fr)}}
+@media (max-width:900px){
+  .story-grid,.card-grid,.setup-grid,.start-grid,.faq-grid{grid-template-columns:minmax(0,1fr)}
+  .clock{font-size:clamp(64px,17vw,96px);margin-bottom:12px}
+  html.deck .story-grid{gap:0;align-content:start}
+  html.deck .beats{height:200px}
+  .beat h3{font-size:clamp(34px,9vw,48px)}
+  html.deck .setup-grid{gap:18px}
+  .setup-copy .sub2{display:none}
+  .setup-screen{padding:16px 14px}
+  .setup-screen h3{font-size:24px}
+  .sbtn{padding:11px 8px;font-size:15px}
+  .card-grid,.start-grid{gap:20px}
+  .card-grid .big-h{font-size:clamp(30px,8.4vw,38px)}
+  .card-grid .kicker{margin-bottom:10px}
+  .list{margin-top:10px}.list li{padding:7px 0;font-size:14px}
+  .ticket{padding:14px 16px 32px;font-size:12.5px}
+  .ticket header{margin-bottom:10px;padding-bottom:8px}
+  .ticket dl{gap:5px 10px}
+  .ticket .foot{margin-top:10px;padding-top:8px;font-size:11.5px}
+  .stamp{font-size:26px;padding:4px 10px;right:-6px}
+  .giant{font-size:clamp(70px,31vw,290px)}
+  html.deck .mstage{height:min(31vh,260px)}
+  #fig{font-size:clamp(54px,15vw,78px)}
+  html.deck #mbeats{height:128px}
+  #mbeats .beat h3{font-size:clamp(28px,7.6vw,38px)}
+  #mbeats .beat p{font-size:15px;margin-top:8px}
+  .figlabel{margin:2px 0 8px;font-size:12px}
+  .jv{margin-top:8px;gap:6px}.jv span{font-size:11px}
+  .jv button{min-height:36px;padding:0 12px;font-size:14px}
+  .price{font-size:clamp(84px,24vw,130px)}
+  .perks li{padding:8px 0;font-size:15px}
+  .coin{width:min(210px,100%)}
+  #f{padding:18px;gap:12px}
+  .faq-grid{gap:16px}
+  .faq-list{max-height:calc(100vh - 300px)}
+}
+@media (max-height:700px) and (min-width:901px){
+  .lede{font-size:17px}
+  .hero h1{font-size:clamp(48px,min(8vw,14vh),130px)}
+}
+</style>
+</head>
+<body>
+<div id="prog" aria-hidden="true"><i></i></div>
+<div id="sweep" aria-hidden="true"></div>
+<header id="bar">
+  <a class="mark" href="#sc-hero" data-go="sc-hero">Hands Full</a>
+  <a class="btn" href="#sc-start" data-go="sc-start" data-k="1">Start free trial</a>
+</header>
+<div id="rail" aria-hidden="true"></div>
+<div id="pager"><button id="prev" class="off" type="button" aria-label="Back one step"><svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 15V2M1.5 7 7 1.5 12.5 7" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Back</span></button><button id="next" type="button"><span id="next-t">Scroll</span><svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 1v13M1.5 9 7 14.5 12.5 9" fill="none" stroke="currentColor" stroke-width="2"/></svg></button></div>
+
+<main id="deck">
+
+<!-- 1. hero -->
+<section class="scene hero theme-y" id="sc-hero" data-theme="y" data-name="Intro" data-steps="1">
+  <div class="scene-in">
+    <div class="w hero-w">
+      <p class="eyebrow">Missed-call texts for UK tradespeople</p>
+      <h1>You were up<br>a ladder.<br><span class="hl">We texted<br>them back.</span></h1>
+      <p class="lede">Miss a call on site and your customer gets a text in seconds. It finds out what the job is, where it is and when suits. You get a job card, and ring back the ones worth having.</p>
+      <div class="cta-row">
+        <a class="btn" href="#sc-start" data-go="sc-start" data-k="1">Try it free for 14 days</a>
+        <span class="fine">£15 a month after. No contract. Nothing to install.</span>
+      </div>
+    </div>
+    <div class="hero-phone" aria-hidden="true">
+      <div class="note hero-note" id="hnote"></div>
+      <div class="ph3">
+        <div class="screen">
+          <div class="screen-head"><b>Smith Plumbing</b><span>Text message</span></div>
+          <div class="msgs">
+            <div class="m a">Hi, it's the automated assistant for Smith Plumbing. Dave missed your call, he's on a job. What do you need doing?</div>
+            <div class="m c">boiler making a loud banging noise</div>
+            <div class="m a">Sorry to hear that. Is it still heating the house? And what's the postcode?</div>
+            <div class="m c">yeah still works. 14 Mill Road CB2 9AB</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tape" aria-hidden="true"></div>
+</section>
+
+<!-- 2. try it -->
+<section class="scene theme-k" id="sc-try" data-theme="k" data-name="Try it" data-steps="1">
+  <div class="scene-in"><div class="w try-grid">
+    <div class="try-copy">
+      <p class="kicker">Try it</p>
+      <h2 class="big-h">You're the <em>customer</em></h2>
+      <p class="copy">Type like you're ringing about a leaking tap, or tap a suggestion. Watch the tradie's phone on the right.</p>
+      <div class="who">
+        <input id="dn" placeholder="Your first name" maxlength="20" aria-label="Your first name, to personalise the demo" autocomplete="off">
+        <input id="db" placeholder="Your business" maxlength="30" aria-label="Your business name, to personalise the demo" autocomplete="off">
+      </div>
+      <p class="hint">It plays itself first. Touch anything to take over.</p>
+    </div>
+    <div class="stage3d try-stage">
+      <div class="scale" id="try-scale">
+        <div class="phone">
+          <div class="screen">
+            <div class="screen-head"><b id="d-biz">Smith Plumbing</b><span>Text message</span></div>
+            <div class="msgs" id="dm" aria-live="polite"></div>
+            <div class="chips" id="dc"></div>
+            <div class="derr" id="derr" role="alert"></div>
+            <form class="inrow" id="dform">
+              <input id="dinp" placeholder="Reply as the customer" aria-label="Reply as the customer" autocomplete="off" maxlength="300">
+              <button type="submit">Send</button>
+            </form>
+          </div>
+          <div class="mobnote" id="mobnote"></div>
+        </div>
+        <div class="phone d" id="dphone">
+          <div class="lock">
+            <div class="lock-time">10:21</div>
+            <div class="lock-sub" id="lsub">Dave's phone, up a ladder</div>
+            <div class="notes" id="notes"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 3-7. the missed call -->
+<section class="scene theme-k" id="sc-story" data-theme="k" data-name="The missed call" data-steps="5">
+  <div class="scene-in"><div class="w story-grid">
+    <div class="story-copy">
+      <p class="kicker">A missed call, start to finish</p>
+      <div class="clock" id="clock" aria-hidden="true">0:00</div>
+      <div class="beats">
+        <div class="beat"><span class="t">0:00</span><h3>The phone rings.</h3><p>You're mid-job and your hands are full.</p></div>
+        <div class="beat"><span class="t">0:20</span><h3>It rings out.</h3><p>Your phone passes the call on, so they don't get dumped into voicemail.</p></div>
+        <div class="beat"><span class="t">0:21</span><h3>They get a text.</h3><p>It says you've missed them, that it's your automated assistant, and asks what they need.</p></div>
+        <div class="beat"><span class="t">2:00</span><h3>They reply.</h3><p>The assistant asks for whatever's missing: what's wrong, the postcode and house number, when they're free.</p></div>
+        <div class="beat"><span class="t">2:05</span><h3>You get a job card.</h3><p>One text, everything on it. You ring back the ones worth having.</p></div>
+      </div>
+    </div>
+    <div class="stage3d story-stage" aria-hidden="true">
+      <div class="scale" id="story-scale">
+        <div class="ph3 dv ringing" id="s-dave">
+          <div class="lockscr">
+            <div class="lock-time">10:21</div>
+            <div class="lock-sub">Dave's phone, up a ladder</div>
+            <div class="notes">
+              <div class="note job" id="s-job">
+                <div class="n-top"><span class="n-ico"></span><span>Hands Full</span><span>now</span></div>
+                <dl><div class="n-row"><dt>Job</dt><dd>Boiler banging loudly</dd></div><div class="n-row"><dt>Where</dt><dd>14 Mill Road, CB2 9AB</dd></div><div class="n-row"><dt>When</dt><dd>Thursday morning</dd></div></dl>
+              </div>
+              <div class="note" id="s-missed">
+                <div class="n-top"><span class="n-ico red"></span><span>Phone</span><span>now</span></div>
+                <div class="n-body">Missed call<small>07700 900333</small></div>
+              </div>
+            </div>
+            <div class="callscr" id="s-call">
+              <small>Incoming call</small>
+              <div class="num">07700 900333</div>
+              <div class="nm">Mobile</div>
+              <div class="avatar"><b>?</b></div>
+              <div class="callbtns"><div class="cb no"><i></i>Decline</div><div class="cb yes"><i></i>Accept</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="ph3 cu" id="s-cust">
+          <div class="screen">
+            <div class="screen-head"><b>Smith Plumbing</b><span>Text message</span></div>
+            <div class="msgs">
+              <div class="m a">Hi, it's the automated assistant for Smith Plumbing. Dave missed your call, he's on a job. What do you need doing?</div>
+              <div class="m c">boiler making a loud banging noise</div>
+              <div class="m a">Sorry to hear that. Is it still heating the house? And what's the postcode?</div>
+              <div class="m c">yeah still works. 14 Mill Road CB2 9AB</div>
+              <div class="m a">Thanks. When are you free for Dave to take a look?</div>
+              <div class="m c">thursday morning</div>
+              <div class="m a">Got it. I've passed it all to Dave and he'll ring you back soon.</div>
+            </div>
+            <div class="inrow"><div class="fakein">Text message</div></div>
+          </div>
+        </div>
+        <div class="flycard" id="s-fly">
+          <header>Job card</header>
+          <dl><dt>Job</dt><dd>Boiler banging loudly</dd><dt>Where</dt><dd>14 Mill Road, CB2 9AB</dd><dt>When</dt><dd>Thursday morning</dd></dl>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 8-11. what a missed call is worth -->
+<section class="scene theme-y" id="sc-money" data-theme="y" data-name="The maths" data-steps="4">
+  <div class="scene-in"><div class="w story-grid">
+    <div class="story-copy">
+      <p class="kicker">What's a missed call worth?</p>
+      <div class="figwrap" id="figwrap">
+        <div class="clock" id="fig">52</div>
+        <p class="figlabel" id="figlabel">missed calls a year</p>
+      </div>
+      <div class="beats" id="mbeats">
+        <div class="beat"><h3>One missed call a week.</h3><p>That's 52 a year. Plenty are wrong numbers and people after a price. Some aren't.</p></div>
+        <div class="beat"><h3>1 in 10 was a real job.</h3><p>Get back to them in a minute instead of a day, and 5 of those would have booked with you.</p></div>
+        <div class="beat"><h3 id="b2h">At £300 a job.</h3><p>That's what walks off to whoever picked up.</p></div>
+        <div class="beat"><h3>Hands Full costs £180.</h3><p>Win back one job and it's paid for. Rough maths, so your week will differ.</p></div>
+      </div>
+      <div class="jv" id="jv">
+        <span>What's a job worth to you?</span>
+        <button type="button" data-v="150" aria-pressed="false">£150</button>
+        <button type="button" data-v="300" aria-pressed="true">£300</button>
+        <button type="button" data-v="600" aria-pressed="false">£600</button>
+        <button type="button" data-v="1200" aria-pressed="false">£1,200</button>
+      </div>
+    </div>
+    <div class="stage3d" aria-hidden="true">
+      <div class="mstage" id="mstage">
+        <div class="tiles" id="tiles"></div>
+        <div class="bars" id="bars">
+          <div class="bar won"><span class="amt" id="amt-won">£1,500</span><div class="col"></div><span class="cap">Jobs won back a year</span></div>
+          <div class="bar cost"><span class="amt">£180</span><div class="col"></div><span class="cap">Hands Full a year</span></div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 12-13. job card -->
+<section class="scene theme-k" id="sc-card" data-theme="k" data-name="The job card" data-steps="2">
+  <div class="scene-in"><div class="w card-grid">
+    <div>
+      <p class="kicker">What you get</p>
+      <h2 class="big-h">No more &ldquo;someone rang, no message&rdquo;</h2>
+      <ul class="list">
+        <li>What's wrong, in the customer's words</li>
+        <li>The full address, so you can see how far it is</li>
+        <li>When they're free</li>
+        <li>Photos, if a picture helps. They upload them from a link</li>
+        <li>A flag at the top if it sounds urgent</li>
+      </ul>
+    </div>
+    <div class="ticketwrap">
+      <div class="ticket" role="img" aria-label="Example job card: boiler banging, 14 Mill Road CB2 9AB, Thursday morning, two photos">
+        <header><span>Job card</span><span>10:23</span></header>
+        <dl>
+          <dt>Job</dt><dd>Boiler banging loudly, still heating</dd>
+          <dt>Where</dt><dd>14 Mill Road, CB2 9AB</dd>
+          <dt>When</dt><dd>Thursday morning</dd>
+          <dt>Photos</dt><dd>2, tap to open</dd>
+          <dt>Ring</dt><dd>07700 900333</dd>
+        </dl>
+        <div class="foot">Missed call at 10:21, while you were on another job.</div>
+      </div>
+      <div class="stamp" aria-hidden="true">Urgent</div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 14-15. set up -->
+<section class="scene theme-k" id="sc-setup" data-theme="k" data-name="Set up" data-steps="2">
+  <div class="scene-in"><div class="w setup-grid">
+    <div class="setup-copy">
+      <p class="kicker">Setting it up</p>
+      <h2 class="big-h">Three <em>taps</em></h2>
+      <p class="copy">No app, no login, no password. We text you a link, you tap three buttons, and your phone passes on the calls you don't answer. You keep your number.</p>
+      <p class="copy sub2">The page tells you when a test call gets through. If you'd rather not, we'll do it with you on the phone.</p>
+    </div>
+    <div class="setup-phone phone" role="img" aria-label="Example setup page with three buttons: when I don't answer, when I'm on another call, when my phone is off">
+      <div class="setup-screen">
+        <h3>Hi Dave, let's switch it on</h3>
+        <div class="sbtn">When I don't answer<small>after 20 seconds of ringing</small></div>
+        <div class="sbtn">When I'm on another call</div>
+        <div class="sbtn">When my phone is off</div>
+        <div class="islive"><i></i><span>It works. You are live.</span></div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 16-17. price and sign up -->
+<section class="scene theme-y" id="sc-start" data-theme="y" data-name="Free trial" data-steps="2">
+  <div class="scene-in"><div class="w start-grid">
+    <div class="start-copy">
+      <p class="price" id="price">£15<small>a month</small></p>
+      <ul class="perks" id="perks">
+        <li><b>First 14 days free.</b> Cancel in the trial and you pay nothing.</li>
+        <li><b>No contract.</b> One tap on your phone switches it off.</li>
+        <li><b>Up to 40 customer chats a month</b> included.</li>
+        <li><b>We're a small team.</b> Message us and you get a person.</li>
+      </ul>
+    </div>
+    <div class="flip">
+      <div class="flipper" id="flipper">
+        <div class="front"><div class="coin" id="coin"><span>14 days<br>free<small>no card needed</small></span></div></div>
+        <div class="back">
+          <form id="f" novalidate>
+            <h3>Start your free trial</h3>
+            <label class="f" for="name">Your name
+              <input id="name" name="name" autocomplete="given-name" maxlength="80" placeholder="Dave">
+              <span class="err" id="e-name" role="alert"></span>
+            </label>
+            <label class="f" for="trade">Your trade
+              <select id="trade" name="trade">
+                <option value="">Choose one</option>
+                <option>Plumber</option><option>Heating engineer</option><option>Electrician</option><option>Builder</option>
+                <option>Painter and decorator</option><option>Handyman</option><option>Roofer</option><option>Carpenter</option><option>Other</option>
+              </select>
+              <span class="err" id="e-trade" role="alert"></span>
+            </label>
+            <label class="f" for="mobile">Your mobile number
+              <input id="mobile" name="mobile" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="07700 900111">
+              <span class="err" id="e-mobile" role="alert"></span>
+            </label>
+            <div class="hp" aria-hidden="true"><label for="company">Company<input id="company" name="company" tabindex="-1" autocomplete="off"></label></div>
+            <button class="btn" type="submit" id="go">Start my free trial</button>
+            <span class="err" id="e-form" role="alert"></span>
+            <p class="privacy">We'll only use your number to text you about setting this up.</p>
+          </form>
+          <div class="ok" id="ok" hidden>
+            <h3 id="ok-h">Cheers.</h3>
+            <p>We'll text you within a day to get you set up. It takes about a minute.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 18. questions -->
+<section class="scene theme-k" id="sc-faq" data-theme="k" data-name="Questions" data-steps="1">
+  <div class="scene-in"><div class="w faq-grid">
+    <div><p class="kicker">Before you ask</p><h2 class="big-h">Ques&shy;tions</h2></div>
+    <div class="faq-list">
+      <details><summary>Do I have to install anything?</summary><p>No app and no login. We text you a link, you tap three buttons, and your phone does the rest. It takes about a minute.</p></details>
+      <details><summary>Do I keep my number?</summary><p>Yes. Calls ring you first, like they always have. Only the ones you don't answer get passed on.</p></details>
+      <details><summary>Will customers know it's automated?</summary><p>Yes. The first text says it's your business's automated assistant and that you've missed their call. It never pretends to be you.</p></details>
+      <details><summary>Does it quote prices or book jobs?</summary><p>No. It collects the details and tells them you'll ring back. What you charge and when you're free is your call.</p></details>
+      <details><summary>What if someone rings from a landline?</summary><p>The text only works on mobiles. A landline caller won't get one, and you'll still see the missed call on your phone as normal.</p></details>
+      <details><summary>What about emergencies?</summary><p>If someone mentions a gas smell or flooding, it tells them to ring 999 or the gas emergency line, and flags the job to you as urgent straight away.</p></details>
+      <details><summary>Will it work on my phone?</summary><p>It uses the call forwarding built into UK mobile networks. We check it works on your phone when we set you up.</p></details>
+      <details><summary>What if I want to stop?</summary><p>Tap one button and calls go back to normal. No contract and no notice period.</p></details>
+    </div>
+  </div></div>
+</section>
+
+<!-- 19. end -->
+<section class="scene theme-k end" id="sc-end" data-theme="k" data-name="End" data-steps="1">
+  <div class="scene-in"><div class="w">
+    <div class="giant" aria-hidden="true">Hands<br>Full</div>
+    <div class="end-foot">
+      <span>Missed-call texts for UK tradespeople. Made in the UK.</span>
+      <a class="btn" href="#sc-start" data-go="sc-start" data-k="1">Start your free trial</a>
+    </div>
+  </div></div>
+</section>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mobile = window.matchMedia && matchMedia('(max-width: 900px)').matches;
+  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+
+  /* ================= the try-it demo ================= */
+  var S, timers = [];
+  var CHIPS = {
+    job: ['Plumbing problem', 'My boiler is making a loud banging noise', 'I can smell gas in the kitchen'],
+    jobmore: ['Boiler bangs every time the heating comes on, still gets hot'],
+    loc: ['Cambridge', 'Trumpington, CB2 9AB', '14 Mill Road, CB2 9AB'],
+    locmore: ['14 Mill Road, CB2 9AB'],
+    time: ['Thursday morning would be best', 'As soon as possible', 'Any weekday after 4pm']
+  };
+  var PC = /\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i;
+  var nm = function () { return $('dn').value.trim() || 'Dave'; };
+  var biz = function () { return $('db').value.trim() || 'Smith Plumbing'; };
+  var jobVague = function (j) { return j.trim().split(/\s+/).length < 4; };
+  var locWeak = function (l) { return !PC.test(l) || !/\b\d+[a-z]?\b/i.test(l.replace(PC, '')); };
+  var later = function (fn, ms) { var t = setTimeout(fn, ms); timers.push(t); return t; };
+
+  function opening() { return "Hi, it's the automated assistant for " + biz() + '. ' + nm() + " missed your call, they're on a job. What do you need doing?"; }
+  function labels() {
+    $('d-biz').textContent = biz();
+    $('lsub').textContent = nm() + "'s phone, up a ladder";
+    if (!S.started) { var first = $('dm').firstChild; if (first) { first.textContent = opening(); S.hist[0].body = opening(); } }
+  }
+  function msg(who, t) {
+    var d = document.createElement('div'); d.className = 'm ' + who; d.textContent = t;
+    $('dm').appendChild(d); $('dm').scrollTop = 1e5; return d;
+  }
+  function chips() {
+    var c = $('dc'); c.replaceChildren();
+    if (S.done || S.auto) return;
+    (CHIPS[S.awaiting] || []).forEach(function (t) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t;
+      b.onclick = function () { submit(t); }; c.appendChild(b);
+    });
+  }
+  function addNote(html, cls) {
+    var d = document.createElement('div'); d.className = 'note ' + (cls || ''); d.innerHTML = html;
+    $('notes').insertBefore(d, $('notes').firstChild); return d;
+  }
+  function missedNote() {
+    addNote('<div class="n-top"><span class="n-ico red"></span><span>Phone</span><span>now</span></div><div class="n-body">Missed call<small>07700 900333</small></div>');
+  }
+  function card() {
+    var r = function (k, v) { return v ? '<div class="n-row"><dt>' + k + '</dt><dd>' + esc(v) + '</dd></div>' : ''; };
+    var html = '<div class="n-top"><span class="n-ico"></span><span>Hands Full' + (S.emerg ? '<b class="urgent-tag">Urgent</b>' : '') + '</span><span>now</span></div>' +
+      '<dl>' + r('Job', S.job) + r('Where', S.loc) + r('When', S.time) + r('Ring', '07700 900333') + '</dl>';
+    addNote(html, 'pop');
+    var p = $('dphone'); p.classList.remove('buzz'); void p.offsetWidth; p.classList.add('buzz');
+    var m = $('mobnote'); m.innerHTML = '<div class="note pop">' + html + '</div>'; m.classList.add('show');
+  }
+
+  /* script brain: drives the autoplay, and is the fallback if the live assistant is unavailable */
+  function extract(t) {
+    var tt = t.trim(), a = S.awaiting;
+    if (/gas (smell|leak)|smell(s|ing)? (of )?gas|flooding|flooded|burst pipe|sparks|smoke|on fire/i.test(tt) && !S.emerg) { S.emerg = true; S.newEmerg = true; }
+    if (a === 'jobmore') { S.job = S.job + '. ' + tt; return; }
+    if (a === 'locmore') { S.loc = S.loc + ', ' + tt; return; }
+    var pc = tt.match(PC), pl = tt.match(/\b(?:in|at|near|around)\s+([A-Z][a-zA-Z']{2,}(?:\s[A-Z][a-zA-Z']+)?)/);
+    var tm = tt.match(/\b(today|tonight|tomorrow|asap|as soon as possible|urgent|monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekend|weekday|next week|this week|morning|afternoon|evening|anytime|any time|flexible|after \d+\s?(am|pm)?)\b/i);
+    if (!S.loc && (pc || pl)) S.loc = tt.length <= 40 ? tt : (pc ? pc[0] : pl[1]);
+    if (!S.time && tm) S.time = tt.length <= 40 ? tt : tm[0];
+    if (!S.job && a === 'job') S.job = tt;
+    if (!S.loc && a === 'loc') S.loc = tt;
+    if (!S.time && a === 'time') S.time = tt;
+  }
+  function scriptReply() {
+    var t = '';
+    if (S.newEmerg) {
+      S.newEmerg = false;
+      t = "That sounds serious. If anyone is in danger, call 999 (gas smell: leave the property and call 0800 111 999). I've flagged this as urgent to " + nm() + '. ';
+    }
+    if (jobVague(S.job) && !S.askedJob) { S.askedJob = true; S.awaiting = 'jobmore'; return t + "Thanks. Can you tell me a bit more about what's happening? Which room or item, and how bad is it?"; }
+    if (!S.loc) { S.awaiting = 'loc'; return t + 'Whereabouts is the job?'; }
+    if (locWeak(S.loc) && !S.askedLoc) { S.askedLoc = true; S.awaiting = 'locmore'; return t + 'Could you give me the postcode and house number so ' + nm() + ' knows exactly where to come?'; }
+    if (!S.time) { S.awaiting = 'time'; return t + 'And when do you need it done, or when are you free?'; }
+    S.done = true; S.awaiting = '';
+    return t + "Thanks, that's everything. I've passed it to " + nm() + " and they'll call you back soon.";
+  }
+  function guessAwaiting(txt) {
+    if (/postcode|house number/i.test(txt)) return S.loc ? 'locmore' : 'loc';
+    if (/whereabouts|where is|address/i.test(txt)) return 'loc';
+    if (/\bwhen\b|what day|free\b/i.test(txt)) return 'time';
+    if (/tell me (a bit )?more|which room|how bad/i.test(txt)) return 'jobmore';
+    return 'job';
+  }
+  function callAI() {
+    var ctrl = new AbortController(), to = setTimeout(function () { ctrl.abort(); }, 14000);
+    return fetch('/demo/chat', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal,
+      body: JSON.stringify({ name: nm(), business: biz(), messages: S.hist })
+    }).then(function (r) { clearTimeout(to); if (!r.ok) throw new Error('ai'); return r.json(); });
+  }
+  function applyAI(r) {
+    var d = r.details || {};
+    if (d.job) S.job = d.job; if (d.location) S.loc = d.location; if (d.timing) S.time = d.timing;
+    if (!S.job) S.job = S.hist.filter(function (m) { return m.role === 'user'; })[0].body;
+    S.emerg = S.emerg || !!r.emergency; S.done = !!r.done;
+    S.awaiting = S.done ? '' : guessAwaiting(r.reply);
+    return r.reply;
+  }
+  function submit(text, auto) {
+    if (S.busy || S.done) return;
+    var t = (text !== undefined ? text : $('dinp').value).trim();
+    if (!t) { $('derr').textContent = 'Type a reply first'; return; }
+    $('derr').textContent = ''; $('dinp').value = '';
+    S.busy = true; S.started = true; msg('c', t); S.hist.push({ role: 'user', body: t }); $('dc').replaceChildren();
+    var dots = msg('a t', '...'), t0 = Date.now();
+    var ask = (S.mode === 'script' || auto) ? Promise.reject(new Error('script')) : callAI();
+    ask.then(function (r) { S.mode = 'ai'; return applyAI(r); })
+      .catch(function () { if (!auto) S.mode = 'script'; extract(t); return scriptReply(); })
+      .then(function (replyText) {
+        later(function () {
+          dots.remove(); msg('a', replyText); S.hist.push({ role: 'assistant', body: replyText }); S.busy = false;
+          if (S.done) {
+            $('dform').style.display = 'none';
+            var b = document.createElement('button'); b.type = 'button'; b.className = 'again'; b.textContent = 'Try it again';
+            b.onclick = reset; $('dc').replaceChildren(); $('dc').appendChild(b);
+            later(card, 450);
+          } else chips();
+        }, Math.max(0, 900 - (Date.now() - t0)));
+      });
+  }
+  function reset() {
+    timers.forEach(clearTimeout); timers = [];
+    S = { loc: '', time: '', job: '', awaiting: 'job', done: false, emerg: false, newEmerg: false, busy: false, started: false,
+      askedJob: false, askedLoc: false, auto: false, mode: '', hist: [{ role: 'assistant', body: '' }] };
+    S.hist[0].body = opening();
+    $('dm').replaceChildren(); msg('a', S.hist[0].body);
+    $('dform').style.display = 'flex'; $('derr').textContent = ''; $('dinp').value = '';
+    $('notes').replaceChildren(); missedNote();
+    $('mobnote').classList.remove('show'); $('mobnote').replaceChildren();
+    labels(); chips();
+  }
+  function autoplay() {
+    if (reduce || S.started || S.auto) return;
+    S.auto = true; chips();
+    var steps = ['My boiler is making a loud banging noise', '14 Mill Road, CB2 9AB', 'Thursday morning would be best'], i = 0;
+    function typeInto(txt, done) {
+      var n = 0;
+      (function tick() {
+        if (!S.auto) return;
+        n++; $('dinp').value = txt.slice(0, n);
+        if (n < txt.length) later(tick, 38); else later(function () { done(); }, 450);
+      })();
+    }
+    function waitIdle(cb) { if (!S.auto) return; if (S.busy) later(function () { waitIdle(cb); }, 200); else later(cb, 1100); }
+    function next() {
+      if (!S.auto || i >= steps.length) return;
+      var txt = steps[i++];
+      typeInto(txt, function () { submit(txt, true); waitIdle(next); });
+    }
+    later(next, 500);
+  }
+  function takeOver() { if (S.auto) reset(); }
+  ['pointerdown', 'keydown'].forEach(function (ev) { $('sc-try').addEventListener(ev, takeOver, true); });
+  $('dform').addEventListener('submit', function (e) { e.preventDefault(); submit(); });
+  $('dinp').addEventListener('input', function () { $('derr').textContent = ''; });
+  $('dn').addEventListener('input', labels); $('db').addEventListener('input', labels);
+  reset();
+
+  /* ================= money tiles ================= */
+  var JOBS = [3, 14, 26, 38, 49], val = 300, fk = 0;
+  var gbp = function (n) { return '£' + Math.round(n).toLocaleString('en-GB'); };
+  (function () {
+    var h = '';
+    for (var i = 0; i < 52; i++) h += '<i class="tile' + (JOBS.indexOf(i) > -1 ? ' job' : '') + '">' + (JOBS.indexOf(i) > -1 ? '<b></b>' : '') + '</i>';
+    $('tiles').innerHTML = h;
+  })();
+  function figs() {
+    var total = 5 * val;
+    return [['52', 'missed calls a year'], ['5', 'would have booked'], [gbp(total), 'walking off to someone else'], [gbp(total - 180), 'better off with Hands Full']];
+  }
+  function renderFig() { var f = figs()[fk]; $('fig').textContent = f[0]; $('figlabel').textContent = f[1]; }
+  function renderMoney() {
+    var total = 5 * val;
+    Array.prototype.forEach.call(document.querySelectorAll('.tile.job b'), function (b) { b.textContent = gbp(val); });
+    $('amt-won').textContent = gbp(total);
+    $('bars').style.setProperty('--pct', Math.max(0.07, Math.min(0.6, 180 / total)));
+    $('b2h').textContent = 'At ' + gbp(val) + ' a job.';
+    renderFig();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#jv button'), function (b) {
+    b.addEventListener('click', function () {
+      val = +b.getAttribute('data-v');
+      Array.prototype.forEach.call(document.querySelectorAll('#jv button'), function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      renderMoney();
+    });
+  });
+  renderMoney();
+
+  /* ================= sign up ================= */
+  var form = $('f'), ok = $('ok'), goBtn = $('go');
+  function setErr(id, m) { $('e-' + id).textContent = m || ''; }
+  ['name', 'trade', 'mobile'].forEach(function (id) {
+    $(id).addEventListener('input', function () { setErr(id, ''); setErr('form', ''); });
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = { name: form.name.value.trim(), trade: form.trade.value, mobile: form.mobile.value.trim(), company: form.company.value };
+    var digits = v.mobile.replace(/[^\d]/g, ''), bad = false;
+    if (!v.name) { setErr('name', 'Enter your first name'); bad = true; }
+    if (!v.trade) { setErr('trade', 'Choose your trade'); bad = true; }
+    if (digits.length < 10 || digits.length > 13) { setErr('mobile', 'Enter a mobile number, like 07700 900111'); bad = true; }
+    if (bad) return;
+    goBtn.textContent = 'Sending...';
+    fetch('/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(v) })
+      .then(function (r) {
+        if (!r.ok) { var bad = new Error('bad'); bad.status = r.status; throw bad; }
+        $('ok-h').textContent = 'Cheers, ' + v.name + '.';
+        form.hidden = true; ok.hidden = false;
+      })
+      .catch(function (err) { setErr('form', err && (err.status === 404 || err.status === 405) ? 'This is a preview, so sign-ups are switched off here.' : 'Something went wrong. Try again in a minute.'); goBtn.textContent = 'Start my free trial'; });
+  });
+
+  /* ================= the deck: one step per gesture ================= */
+  if (!window.gsap || reduce) return; /* plain scrolling page */
+  var html = document.documentElement;
+  html.classList.add('deck');
+  var sw = $('sweep'); for (var n = 1; n <= 30; n++) { var sp = document.createElement('span'); sp.style.left = ((n - 1) * 100) + 'px'; sp.textContent = n * 10; sw.appendChild(sp); }
+  var SPEED = 1.15; /* above 1 makes every step slower */
+  var SWIPE = 1;    /* 1: swipe or scroll down the page to go on, up to go back. -1 flips it. */
+
+  var scenes = Array.prototype.slice.call(document.querySelectorAll('.scene'));
+  var SC = scenes.map(function (el) {
+    return { el: el, id: el.id, inner: el.querySelector('.scene-in'), steps: +el.getAttribute('data-steps') || 1, theme: el.getAttribute('data-theme'), name: el.getAttribute('data-name'), tl: null, labels: [], tw: null };
+  });
+  var byId = {}; SC.forEach(function (s, i) { byId[s.id] = i; });
+  var plan = []; SC.forEach(function (s, i) { for (var k = 0; k < s.steps; k++) plan.push({ s: i, k: k }); });
+  var cur = 0, busy = false, lockUntil = 0, armed = true, heroNotes = null;
+
+  /* scale the 3D stages to fit the screen */
+  function fitStage(stage, scaleEl, natW, natH, reserve) {
+    var availH = innerHeight - 96 - reserve, availW = stage.clientWidth;
+    var s = Math.max(0.36, Math.min(mobile ? 1 : 1.3, availH / natH, availW / natW));
+    scaleEl.style.transform = 'scale(' + s + ')';
+    stage.style.height = Math.round(natH * s) + 'px';
+  }
+  function fit() {
+    fitStage(document.querySelector('.story-stage'), $('story-scale'), 610, 626, mobile ? 300 : 0);
+    fitStage(document.querySelector('.try-stage'), $('try-scale'), mobile ? 332 : 602, mobile ? 640 : 660, mobile ? 250 : 0);
+  }
+  fit();
+  addEventListener('resize', function () { if (matchMedia('(max-width: 900px)').matches !== mobile) { location.reload(); return; } fit(); });
+
+  /* timelines: each scene has one paused master timeline with a label per step, and a step is a tween to its label */
+  var $q = function (root, q) { return root.querySelector(q); }, $$q = function (root, q) { return Array.prototype.slice.call(root.querySelectorAll(q)); };
+  var OUT = { opacity: 0, y: -40, rotationX: 35, duration: 0.6 }, INTO = { opacity: 1, y: 0, rotationX: 0, duration: 0.6 };
+  function beatSetup(beats) { gsap.set(beats, { opacity: 0, y: 50, rotationX: -40, transformOrigin: '50% 100%', transformPerspective: 800 }); }
+
+  function buildStory(sc) {
+    var el = sc.el, dv = $q(el, '#s-dave'), cu = $q(el, '#s-cust'), fly = $q(el, '#s-fly'), call = $q(el, '#s-call'), missed = $q(el, '#s-missed'), job = $q(el, '#s-job');
+    var beats = $$q(el, '.beat'), bubbles = $$q(el, '#s-cust .m'), clock = $q(el, '#clock');
+    beatSetup(beats);
+    gsap.set(dv, { x: mobile ? 0 : 60, y: 90, opacity: 0, rotationY: mobile ? -10 : -14, rotationX: 5 });
+    gsap.set(cu, { x: mobile ? 340 : 420, z: -400, rotationY: 68, opacity: 0 });
+    gsap.set(bubbles, { opacity: 0, y: 16, scale: 0.96 });
+    gsap.set(fly, { opacity: 0 });
+    gsap.set(job, { maxHeight: 0, opacity: 0, paddingTop: 0, paddingBottom: 0 });
+    gsap.set(missed, { opacity: 0, y: -16 });
+    var tl = gsap.timeline({ paused: true, defaults: { ease: 'power2.inOut' }, onUpdate: function () {
+      var t = tl.time(), label = t < 2.1 ? '0:00' : t < 4.0 ? '0:20' : t < 6.4 ? '0:21' : t < 9.7 ? '2:00' : '2:05';
+      if (clock.textContent !== label) clock.textContent = label;
+      dv.classList.toggle('ringing', t < 1.8);
+    } });
+    /* 0:00  it rings */
+    tl.to(dv, { y: 0, opacity: 1, duration: 1.2, ease: 'power3.out' }, 0).to(beats[0], INTO, 0.3);
+    /* 0:20  it rings out */
+    tl.to(beats[0], OUT, 1.8).to(beats[1], INTO, 2.1).to(call, { opacity: 0, duration: 0.5 }, 1.9)
+      .to(missed, { opacity: 1, y: 0, duration: 0.5 }, 2.2).to(dv, { rotationY: mobile ? -4 : -8, duration: 1.4 }, 1.8);
+    /* 0:21  the customer's phone swings in */
+    tl.to(beats[1], OUT, 3.7).to(beats[2], INTO, 4.0);
+    if (!mobile) {
+      tl.to(dv, { x: -160, z: -90, scale: 0.93, rotationY: 20, duration: 1.6 }, 3.7).to(cu, { x: 160, z: 0, rotationY: -16, opacity: 1, duration: 1.6 }, 3.7);
+    } else {
+      tl.to(dv, { x: -360, rotationY: 60, opacity: 0, duration: 1.4 }, 3.7).to(cu, { x: 0, z: 0, rotationY: 0, opacity: 1, duration: 1.6 }, 3.9);
+    }
+    tl.to(bubbles[0], { opacity: 1, y: 0, scale: 1, duration: 0.5 }, 5.0);
+    /* 2:00  the chat builds */
+    tl.to(beats[2], OUT, 6.1).to(beats[3], INTO, 6.4);
+    bubbles.slice(1).forEach(function (b, i) { tl.to(b, { opacity: 1, y: 0, scale: 1, duration: 0.45 }, 6.5 + i * 0.42); });
+    /* 2:05  the job card */
+    tl.to(beats[3], OUT, 9.4).to(beats[4], INTO, 9.7);
+    if (!mobile) {
+      tl.fromTo(fly, { opacity: 0, x: 160, y: -20, z: 40, scale: 0.45, rotationY: -16 }, { opacity: 1, duration: 0.3, immediateRender: false }, 9.7)
+        .to(fly, { x: -55, y: -150, z: 190, scale: 1, rotationY: 6, rotationX: -6, duration: 1.3 }, 9.9)
+        .to(fly, { opacity: 0, scale: 0.9, duration: 0.35 }, 11.1)
+        .to(job, { maxHeight: 170, opacity: 1, paddingTop: 11, paddingBottom: 12, duration: 0.5 }, 11.0)
+        .to(dv, { x: -40, z: 120, scale: 1.06, rotationY: 4, duration: 1.3 }, 9.9)
+        .to(cu, { x: 250, z: -160, rotationY: -34, opacity: 0.3, duration: 1.3 }, 9.9);
+    } else {
+      tl.to(cu, { x: 360, rotationY: -60, opacity: 0, duration: 1.2 }, 9.7)
+        .to(dv, { x: 0, rotationY: -6, opacity: 1, duration: 1.4 }, 9.9)
+        .to(job, { maxHeight: 170, opacity: 1, paddingTop: 11, paddingBottom: 12, duration: 0.5 }, 11.0);
+    }
+    tl.to({}, { duration: 0.01 }, 11.9);
+    sc.tl = tl; sc.labels = [1.7, 3.5, 5.9, 9.2, 11.9];
+  }
+
+  function buildMoney(sc) {
+    var el = sc.el, beats = $$q(el, '#mbeats .beat'), tiles = $$q(el, '.tile'), jobT = $$q(el, '.tile.job'), others = tiles.filter(function (t) { return !t.classList.contains('job'); });
+    var jobB = $$q(el, '.tile.job b'), tilesWrap = $q(el, '#tiles'), cols = $$q(el, '.bar .col'), amts = $$q(el, '.bar .amt'), caps = $$q(el, '.bar .cap'), chipsEl = $q(el, '#jv'), figwrap = $q(el, '#figwrap');
+    beatSetup(beats);
+    gsap.set(figwrap, { opacity: 0, y: 30 });
+    gsap.set(tiles, { opacity: 0, rotationX: -90, transformOrigin: '50% 100%', transformPerspective: 600 });
+    gsap.set(jobT, { backgroundColor: 'rgba(17,17,16,0)' });
+    gsap.set(jobB, { opacity: 0 });
+    gsap.set(cols, { scaleY: 0 }); gsap.set(amts, { opacity: 0 }); gsap.set(caps, { opacity: 0 });
+    gsap.set(chipsEl, { opacity: 0, y: 20 });
+    var tl = gsap.timeline({ paused: true, defaults: { ease: 'power2.inOut' }, onUpdate: function () {
+      var t = tl.time(), k = t < 3.5 ? 0 : t < 6.0 ? 1 : t < 8.0 ? 2 : 3;
+      if (k !== fk) { fk = k; renderFig(); }
+    } });
+    /* 52 calls */
+    tl.to(figwrap, { opacity: 1, y: 0, duration: 0.6 }, 0).to(beats[0], INTO, 0.2)
+      .to(tiles, { opacity: 1, rotationX: 0, duration: 0.5, ease: 'back.out(1.6)', stagger: 0.04 }, 0.3);
+    /* 1 in 10 */
+    tl.to(beats[0], OUT, 3.2).to(beats[1], INTO, 3.5).to(others, { opacity: 0.28, duration: 0.7 }, 3.2)
+      .to(jobT, { backgroundColor: '#111110', scale: 1.15, z: 40, duration: 0.5, stagger: 0.3, ease: 'back.out(2)' }, 3.5);
+    /* the money */
+    tl.to(beats[1], OUT, 5.7).to(beats[2], INTO, 6.0).to(jobB, { opacity: 1, duration: 0.4, stagger: 0.2 }, 6.0);
+    /* versus the price */
+    tl.to(beats[2], OUT, 7.7).to(beats[3], INTO, 8.0)
+      .to(tilesWrap, { opacity: 0.06, scale: 0.78, rotationX: 40, z: -300, duration: 1.2 }, 7.7)
+      .to(cols, { scaleY: 1, duration: 1.3, stagger: 0.35, ease: 'power3.out' }, 8.3)
+      .to(amts, { opacity: 1, duration: 0.5, stagger: 0.35 }, 9.2).to(caps, { opacity: 1, duration: 0.5 }, 9.3)
+      .to(chipsEl, { opacity: 1, y: 0, duration: 0.6 }, 9.6);
+    tl.to({}, { duration: 0.01 }, 10.4);
+    sc.tl = tl; sc.labels = [3.0, 5.5, 7.5, 10.4];
+  }
+
+  function buildCard(sc) {
+    var el = sc.el, h2 = $q(el, 'h2'), kick = $q(el, '.kicker'), lis = $$q(el, '.list li'), ticket = $q(el, '.ticket'), stamp = $q(el, '.stamp');
+    var dts = $$q(el, '.ticket dt'), dds = $$q(el, '.ticket dd');
+    gsap.set([h2, kick], { opacity: 0, y: 40 });
+    gsap.set(lis, { opacity: 0, x: -40 });
+    gsap.set(ticket, { opacity: 0, rotationX: -80, y: 60, transformOrigin: '50% 0%', transformPerspective: 1100 });
+    gsap.set(stamp, { opacity: 0, scale: 2.6, rotation: -18 });
+    var tl = gsap.timeline({ paused: true, defaults: { ease: 'power2.out' } });
+    tl.to([kick, h2], { opacity: 1, y: 0, duration: 0.8, stagger: 0.1 }, 0.1).to(ticket, { opacity: 1, rotationX: 0, y: 0, duration: 1.4, ease: 'back.out(1.1)' }, 0.3);
+    /* each line of the list lights up the matching row of the card */
+    lis.forEach(function (li, i) {
+      var at = 2.2 + i * 0.95;
+      tl.to(li, { opacity: 1, x: 0, duration: 0.5 }, at);
+      if (i < 4) {
+        tl.to([dts[i], dds[i]], { backgroundColor: '#FFD60A', color: '#111110', duration: 0.25 }, at)
+          .to([dts[i], dds[i]], { backgroundColor: 'rgba(255,214,10,0)', duration: 0.4 }, at + 0.8);
+      } else {
+        tl.to(stamp, { opacity: 1, scale: 1, rotation: -12, duration: 0.4, ease: 'back.out(3)' }, at + 0.1);
+      }
+    });
+    tl.to({}, { duration: 0.01 }, 7.0);
+    sc.tl = tl; sc.labels = [1.9, 7.0];
+  }
+
+  function buildSetup(sc) {
+    var el = sc.el, copy = $$q(el, '.kicker, h2, .copy'), ph = $q(el, '.setup-phone'), btns = $$q(el, '.sbtn'), live = $q(el, '.islive');
+    gsap.set(copy, { opacity: 0, y: 40 });
+    gsap.set(ph, { rotationY: -55, rotationX: 12, y: 80, opacity: 0.2, transformPerspective: 1400 });
+    gsap.set(live, { opacity: 0, scale: 0.8 });
+    var tl = gsap.timeline({ paused: true, defaults: { ease: 'power2.out' } });
+    tl.to(copy, { opacity: 1, y: 0, duration: 0.8, stagger: 0.15 }, 0.1).to(ph, { rotationY: -8, rotationX: 0, y: 0, opacity: 1, duration: 1.6, ease: 'power2.inOut' }, 0.3);
+    btns.forEach(function (b, i) {
+      var small = b.querySelector('small'), at = 2.5 + i * 0.9;
+      tl.to(b, { backgroundColor: '#FFD60A', color: '#111110', scale: 0.96, duration: 0.25 }, at).to(b, { scale: 1, duration: 0.25 }, at + 0.25);
+      if (small) tl.to(small, { color: '#4b4300', duration: 0.25 }, at);
+    });
+    tl.to(live, { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(2)' }, 5.2).to({}, { duration: 0.01 }, 5.8);
+    sc.tl = tl; sc.labels = [2.1, 5.8];
+  }
+
+  function buildStart(sc) {
+    var el = sc.el, price = $q(el, '#price'), perks = $$q(el, '#perks li'), coin = $q(el, '#coin'), flipper = $q(el, '#flipper'), copy = $q(el, '.start-copy');
+    gsap.set(price, { scale: 1.5, opacity: 0 });
+    gsap.set(perks, { opacity: 0, x: -40 });
+    gsap.set(coin, { rotationY: -180, opacity: 0, transformPerspective: 1000 });
+    gsap.set(flipper, { rotationY: 0 });
+    var tl = gsap.timeline({ paused: true, defaults: { ease: 'power2.out' } });
+    tl.to(price, { scale: 1, opacity: 1, duration: 0.9, ease: 'expo.out' }, 0.1).to(perks, { opacity: 1, x: 0, duration: 0.6, stagger: 0.18 }, 0.7)
+      .to(coin, { rotationY: 0, opacity: 1, duration: 1.2, ease: 'back.out(1.4)' }, 0.6);
+    tl.to(flipper, { rotationY: 180, duration: 1.4, ease: 'power3.inOut' }, 2.5);
+    if (mobile) { gsap.set(copy, { maxHeight: copy.scrollHeight, overflow: 'hidden' }); tl.to(copy, { maxHeight: 0, opacity: 0, duration: 0.9, ease: 'power2.inOut' }, 2.5); }
+    tl.to({}, { duration: 0.01 }, 4.1);
+    sc.tl = tl; sc.labels = [2.3, 4.1];
+  }
+
+  buildStory(SC[byId['sc-story']]); buildMoney(SC[byId['sc-money']]); buildCard(SC[byId['sc-card']]);
+  buildSetup(SC[byId['sc-setup']]); buildStart(SC[byId['sc-start']]);
+  SC[byId['sc-try']].onEnter = function () { setTimeout(autoplay, 700); };
+
+  /* the rail, header and progress tape */
+  var rail = $('rail'), ticks = [];
+  plan.forEach(function (p, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'tick' + (p.k === 0 ? ' first' : '');
+    b.setAttribute('aria-label', 'Go to ' + SC[p.s].name + (SC[p.s].steps > 1 ? ', part ' + (p.k + 1) : '')); b.title = SC[p.s].name;
+    b.innerHTML = '<i></i>'; b.addEventListener('click', function () { go(i); }); rail.appendChild(b); ticks.push(b);
+  });
+  function ui() {
+    ticks.forEach(function (t, i) { t.classList.toggle('now', i === cur); });
+    $q(document, '#prog i').style.transform = 'scaleX(' + (cur / (plan.length - 1)) + ')';
+    html.setAttribute('data-theme', SC[plan[cur].s].theme); html.setAttribute('data-scene', SC[plan[cur].s].id);
+    $('prev').classList.toggle('off', cur === 0);
+    if (heroNotes) heroNotes.paused(plan[cur].s !== 0);
+    $('next-t').textContent = cur === 0 ? 'Scroll' : cur === plan.length - 1 ? 'Back to top' : 'Next';
+  }
+
+  /* moving between steps */
+  function stepWithin(sc, k, cb) {
+    if (sc.tw) sc.tw.kill();
+    var t = sc.labels[k], d = Math.max(0.7, Math.abs(t - sc.tl.time()) * SPEED);
+    sc.tw = sc.tl.tweenTo(t, { duration: d, ease: 'none', onComplete: cb });
+  }
+  function swap(ai, bi, dir, k, cb) {
+    var A = SC[ai], B = SC[bi], need = 1, fin = function () { if (--need === 0) cb(); };
+    if (B.tl) { if (B.tw) B.tw.kill(); B.tl.time(k === 0 && dir > 0 ? 0 : B.labels[k]).pause(); }
+    B.el.classList.add('on'); B.el.style.zIndex = 3; A.el.style.zIndex = 2;
+    var tl = gsap.timeline({ onComplete: function () {
+      A.el.classList.remove('on'); A.el.style.zIndex = ''; B.el.style.zIndex = ''; gsap.set(A.inner, { clearProps: 'all' }); gsap.set(B.inner, { clearProps: 'transform,opacity' });
+      fin();
+    } });
+    tl.fromTo(B.el, { clipPath: dir > 0 ? 'inset(100% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.15, ease: 'power3.inOut' }, 0)
+      .to(A.inner, { y: -dir * 80, opacity: 0, rotationX: dir * 8, duration: 0.8, ease: 'power2.in' }, 0)
+      .fromTo(B.inner, { y: dir * 90, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, 0.55)
+      .fromTo(sw, { opacity: 1, y: dir > 0 ? innerHeight - 66 : -66 }, { y: dir > 0 ? -66 : innerHeight - 66, duration: 1.15, ease: 'power3.inOut' }, 0)
+      .to(sw, { opacity: 0, duration: 0.2 }, 0.95);
+    if (B.tl && k === 0 && dir > 0) { need++; gsap.delayedCall(0.6, function () { stepWithin(B, 0, fin); }); }
+    if (B.onEnter) gsap.delayedCall(1.3, B.onEnter);
+    html.setAttribute('data-theme', B.theme);
+  }
+  function go(n) {
+    if (busy || n === cur || n < 0 || n >= plan.length) return;
+    var a = plan[cur], b = plan[n], dir = n > cur ? 1 : -1;
+    busy = true;
+    var done = function () { busy = false; lockUntil = Date.now() + 450; };
+    if (a.s === b.s) stepWithin(SC[b.s], b.k, done); else swap(a.s, b.s, dir, b.k, done);
+    cur = n; ui();
+  }
+  var step = function (d) { go(cur + d); };
+
+  /* input: one gesture, one step. Wheel inertia and hard flicks are swallowed until the user pauses. */
+  function canScroll(el, dy) {
+    while (el && el !== document.body && el !== html) {
+      var cs = getComputedStyle(el);
+      if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 1) {
+        if (dy > 0 && el.scrollTop + el.clientHeight < el.scrollHeight - 1) return true;
+        if (dy < 0 && el.scrollTop > 0) return true;
+      }
+      el = el.parentElement;
+    }
+    return false;
+  }
+  var idleT;
+  addEventListener('wheel', function (e) {
+    if (canScroll(e.target, e.deltaY)) return;
+    e.preventDefault();
+    clearTimeout(idleT); idleT = setTimeout(function () { armed = true; }, 110);
+    if (Math.abs(e.deltaY) < 4 || !armed || busy || Date.now() < lockUntil) return;
+    armed = false; step((e.deltaY > 0 ? 1 : -1) * SWIPE);
+  }, { passive: false });
+  var ty = null, tTarget = null;
+  addEventListener('touchstart', function (e) { ty = e.touches[0].clientY; tTarget = e.target; }, { passive: true });
+  addEventListener('touchend', function (e) {
+    if (ty === null) return;
+    var dy = ty - e.changedTouches[0].clientY; ty = null;
+    if (Math.abs(dy) < 45 || canScroll(tTarget, dy) || busy || Date.now() < lockUntil) return;
+    step((dy > 0 ? 1 : -1) * SWIPE);
+  }, { passive: true });
+  addEventListener('keydown', function (e) {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'Home') { e.preventDefault(); go(0); return; }
+    if (e.key === 'End') { e.preventDefault(); go(plan.length - 1); return; }
+    var d = { ArrowDown: 1, PageDown: 1, ' ': e.shiftKey ? -1 : 1, ArrowUp: -1, PageUp: -1 }[e.key];
+    if (d && !(e.key === ' ' && /^(BUTTON|A|SUMMARY)$/.test(e.target.tagName))) { e.preventDefault(); if (!busy && Date.now() >= lockUntil) step(d); }
+  });
+  $('prev').addEventListener('click', function () { step(-1); });
+  $('next').addEventListener('click', function () { if (cur === plan.length - 1) go(0); else step(1); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-go]'), function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var sc = byId[a.getAttribute('data-go')], k = +a.getAttribute('data-k') || 0;
+      for (var i = 0; i < plan.length; i++) if (plan[i].s === sc && plan[i].k === k) { go(i); break; }
+    });
+  });
+
+  /* first scene */
+  var startAt = byId[(location.hash || '').slice(1)];
+  if (startAt) { for (var i = 0; i < plan.length; i++) if (plan[i].s === startAt) { cur = i; break; } }
+  var first = plan[cur];
+  SC[first.s].el.classList.add('on');
+  if (SC[first.s].tl) SC[first.s].tl.time(SC[first.s].labels[first.k]);
+  if (SC[first.s].onEnter) SC[first.s].onEnter();
+  ui();
+  if (first.s === 0) {
+    gsap.from('#sc-hero .eyebrow, #sc-hero h1, #sc-hero .lede, #sc-hero .cta-row', { y: 60, opacity: 0, rotationX: -20, transformPerspective: 900, transformOrigin: '0 100%', stagger: 0.12, duration: 1.1, ease: 'power3.out', delay: 0.2 });
+    gsap.from('.hero-phone', { y: 320, opacity: 0, duration: 1.8, delay: 0.5, ease: 'power3.out' });
+    gsap.to('.hero-phone .ph3', { y: -14, duration: 3.2, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+  }
+  /* hero: a little loop of what the tradie's phone shows, and the 3D follows the mouse */
+  var hn = $('hnote');
+  var HN = [['red', 'Phone', 'Missed call', '07700 900333'], ['y', 'Hands Full', 'Text sent', "Hi, it's the automated assistant for Smith Plumbing..."], ['y', 'Hands Full', 'New job card', 'Boiler banging loudly. 14 Mill Road. Thursday morning.']];
+  heroNotes = gsap.timeline({ repeat: -1, repeatDelay: 0.6 });
+  HN.forEach(function (s, i) {
+    heroNotes.call(function () { hn.innerHTML = '<div class="n-top"><span class="n-ico ' + (s[0] === 'red' ? 'red' : '') + '"></span><span>' + s[1] + '</span><span>now</span></div><div class="n-body">' + s[2] + '<small>' + s[3] + '</small></div>'; })
+      .fromTo(hn, { opacity: 0, y: -26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: 'back.out(2)' })
+      .to(hn, { opacity: 0, y: 12, duration: 0.4 }, '+=2.4');
+  });
+  heroNotes.paused(plan[cur].s !== 0);
+  if (matchMedia('(pointer: fine)').matches && !mobile) {
+    var tiltQ = ['.hero-phone', '.try-stage', '.story-stage'].map(function (s) {
+      var el = document.querySelector(s);
+      return { x: gsap.quickTo(el, 'rotationY', { duration: 0.9, ease: 'power3.out' }), y: gsap.quickTo(el, 'rotationX', { duration: 0.9, ease: 'power3.out' }) };
+    });
+    addEventListener('pointermove', function (e) {
+      var nx = e.clientX / innerWidth - 0.5, ny = e.clientY / innerHeight - 0.5;
+      tiltQ.forEach(function (o) { o.x(nx * 10); o.y(-ny * 6); });
+    });
+  }
+  window.__deck = { go: go, plan: plan, step: step, get cur() { return cur; }, get busy() { return busy; } };
+})();
+</script>
+</body>
+</html>
